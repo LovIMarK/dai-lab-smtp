@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class VictimContainerTest {
 
-    private static final String TEST_FILE_PATH = "lab-smtp\\resources\\victims.txt";
+    private static final String TEST_FILE_PATH = "src/test/resources/victims.txt";
     private static final String INVALID_FILE_PATH = "invalid_path.txt";
     private VictimContainer victimContainer;
 
