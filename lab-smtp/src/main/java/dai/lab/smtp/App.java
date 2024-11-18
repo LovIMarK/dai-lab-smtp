@@ -5,6 +5,9 @@ package dai.lab.smtp;
  */
 public class App {
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        VictimContainer victims = new VictimContainer("lab-smtp\\resources\\victims.txt");
+        
+        for(String victim : victims.getVictims())
+            System.out.println(victim);
     }
 }
