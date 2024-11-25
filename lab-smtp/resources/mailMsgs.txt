@@ -1,0 +1,12 @@
+--MAIL--
+Subject: Sujet du mail 1
+Body:
+Ceci est le corps du mail 1.
+--MAIL--
+Subject: Sujet du mail 2
+Body:
+Ceci est le corps du mail 2.
+--MAIL--
+Subject: Sujet du mail 3
+Body:
+Ceci est le corps du mail 3.
