@@ -30,7 +30,7 @@ public class SMTPClient {
     }
 
 
-    public void sendEmail(String sender, List<String> receivers, MailContainer message) throws IOException {
+    public void sendEmail(String sender, List<String> receivers, Mail message) throws IOException {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(smtpSocket.getInputStream()));
              BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(smtpSocket.getOutputStream()))) {
 
@@ -49,9 +49,9 @@ public class SMTPClient {
             sendCommand("DATA", writer);
             readResponse(reader);
 
-         //   writer.write("Subject: " + message.getHeader() + "\r\n");
+            writer.write("Subject: " + message.getSubject() + "\r\n");
             writer.write("\r\n");
-         //   writer.write(message.getBody() + "\r\n");
+            writer.write(message.getBody() + "\r\n");
             writer.write(".\r\n");
             writer.flush();
             readResponse(reader);

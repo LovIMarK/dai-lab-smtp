@@ -8,16 +8,11 @@ import java.util.Random;
 public class MailContainer {
     private static ArrayList<Mail> mailList = new ArrayList<>(); // Liste statique de mails
 
-    public MailContainer(String filePath)
-    {
-        loadMails(filePath);
-    }
-
     /*
     Charge tous les mails d'un fichier et les ajoute à la liste statique.
     @param filePath : chemin du fichier contenant les mails.
     */
-    public void loadMails(String filePath) {
+    public static void loadMails(String filePath) {
         if (filePath == null || filePath.isEmpty()) {
             System.err.println("Chemin du fichier invalide.");
             return;
@@ -73,6 +68,6 @@ public class MailContainer {
     @return : liste des mails.
     */
     public static ArrayList<Mail> getAllMails() {
-        return mailList;
+        return new ArrayList<>(mailList);
     }
 }
