@@ -5,7 +5,7 @@ import java.io.FileReader;
 import java.util.ArrayList;
 
 public class VictimContainer {
-    private static ArrayList<String> victims;
+    public static ArrayList<String> victims = new ArrayList<String>();
 
 
     /*
@@ -13,7 +13,7 @@ public class VictimContainer {
     @return : the list of valid victim email addresses.
     */
     public static ArrayList<String> getVictims() {
-        return new ArrayList<>(victims);
+        return new ArrayList<String>(victims);
     }
 
     /*
@@ -39,12 +39,12 @@ public class VictimContainer {
     @param filePath : the path of the file containing victim email addresses.
     @return : a list of valid victim email addresses or null if the file path is invalid.
     */
-    public static ArrayList<String> loadVictim(String filePath) {
+    public static void loadVictim(String filePath) {
         if (filePath == null || filePath.isEmpty()) {
-            return null;
+            return;
         }
     
-        ArrayList<String> victims = new ArrayList<>();
+        victims = new ArrayList<>();
     
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String userMail = reader.readLine();
@@ -57,9 +57,8 @@ public class VictimContainer {
             }
         } catch (Exception e) {
             System.err.println("Error reading the file: " + e.getMessage());
-            return null;
+            return;
         }
-        return victims;
     }
     
 }

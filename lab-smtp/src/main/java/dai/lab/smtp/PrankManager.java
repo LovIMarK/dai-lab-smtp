@@ -23,6 +23,8 @@ public class PrankManager
 
             VictimContainer.loadVictim(ConfigurationManager.victimsPath);
             MailContainer.loadMails(ConfigurationManager.mailMsgsPath);
+            
+
             ArrayList<String> victims = VictimContainer.getVictims();
 
             
