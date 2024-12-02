@@ -17,7 +17,7 @@ public class PrankManager {
 
         try {
             // Chargement des fichiers de configuration
-            VictimContainer.loadVictim(ConfigurationManager.victimsPath);
+            VictimContainer.loadVictims(ConfigurationManager.victimsPath);
             MailContainer.loadMails(ConfigurationManager.mailMsgsPath);
 
             // Récupération des victimes

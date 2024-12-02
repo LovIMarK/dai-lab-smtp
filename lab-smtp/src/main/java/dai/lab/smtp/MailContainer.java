@@ -5,6 +5,12 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Random;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
 public class MailContainer {
     private static ArrayList<Mail> mailList = new ArrayList<>(); // Liste statique de mails
 
@@ -18,35 +24,33 @@ public class MailContainer {
             return;
         }
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            StringBuilder subjectBuilder = new StringBuilder();
-            StringBuilder bodyBuilder = new StringBuilder();
-            boolean isBody = false;
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
 
-            while ((line = reader.readLine()) != null) {
-                if (line.startsWith("Subject:")) {
-                    if (subjectBuilder.length() > 0 || bodyBuilder.length() > 0) {
-                        // Ajoute le mail actuel à la liste avant de commencer un nouveau
-                        mailList.add(new Mail(subjectBuilder.toString(), bodyBuilder.toString()));
-                        subjectBuilder.setLength(0);
-                        bodyBuilder.setLength(0);
-                    }
-                    subjectBuilder.append(line.substring(8).trim());
-                    isBody = false;
-                } else if (line.startsWith("Body:")) {
-                    isBody = true;
-                } else if (isBody) {
-                    bodyBuilder.append(line).append("\n");
+            // Charger le JSON à partir du fichier
+            JsonNode rootNode = objectMapper.readTree(new File(filePath));
+
+            // Extraire la liste des mails sous la clé "emails"
+            JsonNode emailsNode = rootNode.path("emails");
+
+            // Vérifier si la clé "emails" est présente et est un tableau
+            if (emailsNode.isArray()) {
+                // Désérialiser la liste de mails
+                List<Mail> loadedMails = objectMapper.readValue(emailsNode.toString(), objectMapper.getTypeFactory().constructCollectionType(List.class, Mail.class));
+
+                // Ajouter les mails chargés à la liste statique mailList
+                mailList.addAll(loadedMails);
+
+                // Afficher les mails chargés
+                for (Mail mail : loadedMails) {
+                    System.out.println("Subject: " + mail.getSubject());
+                    System.out.println("Body: " + mail.getBody());
                 }
+            } else {
+                System.err.println("La clé 'emails' n'est pas présente ou n'est pas un tableau.");
             }
 
-            // Ajoute le dernier mail après la boucle
-            if (subjectBuilder.length() > 0 || bodyBuilder.length() > 0) {
-                mailList.add(new Mail(subjectBuilder.toString(), bodyBuilder.toString()));
-            }
-
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.err.println("Erreur lors de la lecture du fichier : " + e.getMessage());
         }
     }

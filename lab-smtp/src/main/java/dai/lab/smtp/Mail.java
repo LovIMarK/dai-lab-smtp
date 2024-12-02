@@ -7,9 +7,8 @@ package dai.lab.smtp;
         private String subject; // Sujet de l'email
         private String body;    // Corps de l'email
 
-        /*
-        Constructeur privé de la classe interne
-        */
+        public Mail() {}
+      
         public Mail(String subject, String body) {
             this.subject = subject;
             this.body = body;
