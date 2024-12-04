@@ -1,64 +1,87 @@
 package dai.lab.smtp;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
+/**
+ * A container class for managing the list of victims (email addresses).
+ * It validates email formats and loads a list of victims from a JSON file.
+ * 
+ * @author Samuel Fernandez
+ * @author Lovink Mark
+ */
 public class VictimContainer {
+
     public static ArrayList<String> victims = new ArrayList<String>();
 
-
-    /*
-    Getter for the list of victims.
-    @return : the list of valid victim email addresses.
-    */
+    /**
+     * Retrieves the list of valid victim email addresses.
+     * 
+     * @return A list of valid victim email addresses.
+     */
     public static ArrayList<String> getVictims() {
         return new ArrayList<String>(victims);
     }
 
-    /*
-    Validates the format of an email address.
-    @param userMail : the email address to validate.
-    @return : true if the email is valid, false otherwise.
-    */
+    /**
+     * Validates the format of an email address.
+     * 
+     * @param userMail The email address to validate.
+     * @return true if the email is valid, false otherwise.
+     */
     private static boolean validateVictim(String userMail) {
         if (userMail == null || userMail.isEmpty()) {
             return false;
         }
-        
-        // Expression régulière pour valider les emails
+
+        // Regular expression to validate emails
         String emailRegex = "^[\\w._%+-]+@[\\w-]+(\\.[\\w-]+)*\\.[a-zA-Z]{2,}$";
-    
-        // Retourne vrai si l'email correspond à l'expression régulière, sinon faux
+
         return userMail.matches(emailRegex);
     }
-    
 
-    /*
-    Loads a list of valid email addresses from a file.
-    @param filePath : the path of the file containing victim email addresses.
-    @return : a list of valid victim email addresses or null if the file path is invalid.
-    */
-    public static void loadVictim(String filePath) {
+    /**
+     * Loads a list of valid email addresses from a JSON file.
+     * 
+     * @param filePath The path of the file containing victim email addresses.
+     */
+    public static void loadVictims(String filePath) {
         if (filePath == null || filePath.isEmpty()) {
             return;
         }
-    
-        victims = new ArrayList<>();
-    
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String userMail = reader.readLine();
-    
-            while (userMail != null) {
-                if (validateVictim(userMail)) {
-                    victims.add(userMail);
+
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            // Load JSON from the file
+            VictimList victimList = objectMapper.readValue(new File(filePath), VictimList.class);
+
+            victims = new ArrayList<>();
+            // Add each valid email to the list
+            for (String email : victimList.getVictims()) {
+                if (validateVictim(email)) {
+                    victims.add(email);
                 }
-                userMail = reader.readLine();
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.err.println("Error reading the file: " + e.getMessage());
-            return;
         }
     }
-    
+
+    /**
+     * A nested class to represent the structure of the JSON data for victims.
+     */
+    public static class VictimList {
+        private ArrayList<String> victims;
+
+        public ArrayList<String> getVictims() {
+            return victims;
+        }
+
+        public void setVictims(ArrayList<String> victims) {
+            this.victims = victims;
+        }
+    }
 }

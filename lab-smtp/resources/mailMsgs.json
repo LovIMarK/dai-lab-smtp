@@ -1,0 +1,16 @@
+{
+  "emails": [
+    {
+      "subject": "Sujet du mail 1",
+      "body": "Ceci est le corps du mail 1."
+    },
+    {
+      "subject": "Sujet du mail 2",
+      "body": "Ceci est le corps du mail 2."
+    },
+    {
+      "subject": "Sujet du mail 3",
+      "body": "Ceci est le corps du mail 3."
+    }
+  ]
+}

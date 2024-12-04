@@ -1,0 +1,8 @@
+{
+    "ipAddress": "127.0.0.1",
+    "port": 1025,
+    "victimsPath": "lab-smtp/resources/victims.json",
+    "mailMsgsPath": "lab-smtp/resources/mailMsgs.json",
+    "groupSize": 3
+  }
+  

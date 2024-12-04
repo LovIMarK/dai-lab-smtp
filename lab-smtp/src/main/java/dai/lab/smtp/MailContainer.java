@@ -1,72 +1,83 @@
 package dai.lab.smtp;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class MailContainer {
-    private static ArrayList<Mail> mailList = new ArrayList<>(); // Liste statique de mails
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
-    /*
-    Charge tous les mails d'un fichier et les ajoute à la liste statique.
-    @param filePath : chemin du fichier contenant les mails.
-    */
+/**
+ * Manages a static list of Mail objects, including methods to load, retrieve, and manage emails.
+ * 
+ * @author Samuel Fernandez
+ * @author Lovink Mark
+ */
+public class MailContainer {
+    private static ArrayList<Mail> mailList = new ArrayList<>(); // Static list of mails
+
+    /**
+     * Loads all mails from a JSON file and adds them to the static mail list.
+     * 
+     * @param filePath The path of the file containing the emails.
+     */
     public static void loadMails(String filePath) {
         if (filePath == null || filePath.isEmpty()) {
-            System.err.println("Chemin du fichier invalide.");
+            System.err.println("Invalid file path.");
             return;
         }
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            StringBuilder subjectBuilder = new StringBuilder();
-            StringBuilder bodyBuilder = new StringBuilder();
-            boolean isBody = false;
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
 
-            while ((line = reader.readLine()) != null) {
-                if (line.startsWith("Subject:")) {
-                    if (subjectBuilder.length() > 0 || bodyBuilder.length() > 0) {
-                        // Ajoute le mail actuel à la liste avant de commencer un nouveau
-                        mailList.add(new Mail(subjectBuilder.toString(), bodyBuilder.toString()));
-                        subjectBuilder.setLength(0);
-                        bodyBuilder.setLength(0);
-                    }
-                    subjectBuilder.append(line.substring(8).trim());
-                    isBody = false;
-                } else if (line.startsWith("Body:")) {
-                    isBody = true;
-                } else if (isBody) {
-                    bodyBuilder.append(line).append("\n");
+            // Load JSON from the file
+            JsonNode rootNode = objectMapper.readTree(new File(filePath));
+
+            // Extract the list of mails under the "emails" key
+            JsonNode emailsNode = rootNode.path("emails");
+
+            // Check if the "emails" key is present and is an array
+            if (emailsNode.isArray()) {
+                // Deserialize the list of mails
+                List<Mail> loadedMails = objectMapper.readValue(emailsNode.toString(), objectMapper.getTypeFactory().constructCollectionType(List.class, Mail.class));
+
+                // Add the loaded mails to the static mailList
+                mailList.addAll(loadedMails);
+
+                // Print the loaded mails
+                for (Mail mail : loadedMails) {
+                    System.out.println("Subject: " + mail.getSubject());
+                    System.out.println("Body: " + mail.getBody());
                 }
+            } else {
+                System.err.println("The 'emails' key is not present or is not an array.");
             }
 
-            // Ajoute le dernier mail après la boucle
-            if (subjectBuilder.length() > 0 || bodyBuilder.length() > 0) {
-                mailList.add(new Mail(subjectBuilder.toString(), bodyBuilder.toString()));
-            }
-
-        } catch (Exception e) {
-            System.err.println("Erreur lors de la lecture du fichier : " + e.getMessage());
+        } catch (IOException e) {
+            System.err.println("Error reading the file: " + e.getMessage());
         }
     }
 
-    /*
-    Récupère un mail aléatoire de la liste statique.
-    @return : un objet Mail aléatoire.
-    */
+    /**
+     * Retrieves a random mail from the static list.
+     * 
+     * @return A random Mail object.
+     */
     public static Mail getRandomMail() {
         if (mailList.isEmpty()) {
-            throw new IllegalStateException("Aucun mail disponible. Chargez les mails d'abord.");
+            throw new IllegalStateException("No mails available. Please load the mails first.");
         }
         Random random = new Random();
         return mailList.get(random.nextInt(mailList.size()));
     }
 
-    /*
-    Retourne la liste complète des mails.
-    @return : liste des mails.
-    */
+    /**
+     * Returns the complete list of mails.
+     * 
+     * @return The list of all mails.
+     */
     public static ArrayList<Mail> getAllMails() {
         return new ArrayList<>(mailList);
     }
