@@ -1,7 +1,5 @@
 package dai.lab.smtp;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -11,66 +9,75 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Manages a static list of Mail objects, including methods to load, retrieve, and manage emails.
+ * 
+ * @author Samuel Fernandez
+ * @author Lovink Mark
+ */
 public class MailContainer {
-    private static ArrayList<Mail> mailList = new ArrayList<>(); // Liste statique de mails
+    private static ArrayList<Mail> mailList = new ArrayList<>(); // Static list of mails
 
-    /*
-    Charge tous les mails d'un fichier et les ajoute à la liste statique.
-    @param filePath : chemin du fichier contenant les mails.
-    */
+    /**
+     * Loads all mails from a JSON file and adds them to the static mail list.
+     * 
+     * @param filePath The path of the file containing the emails.
+     */
     public static void loadMails(String filePath) {
         if (filePath == null || filePath.isEmpty()) {
-            System.err.println("Chemin du fichier invalide.");
+            System.err.println("Invalid file path.");
             return;
         }
 
         try {
             ObjectMapper objectMapper = new ObjectMapper();
 
-            // Charger le JSON à partir du fichier
+            // Load JSON from the file
             JsonNode rootNode = objectMapper.readTree(new File(filePath));
 
-            // Extraire la liste des mails sous la clé "emails"
+            // Extract the list of mails under the "emails" key
             JsonNode emailsNode = rootNode.path("emails");
 
-            // Vérifier si la clé "emails" est présente et est un tableau
+            // Check if the "emails" key is present and is an array
             if (emailsNode.isArray()) {
-                // Désérialiser la liste de mails
+                // Deserialize the list of mails
                 List<Mail> loadedMails = objectMapper.readValue(emailsNode.toString(), objectMapper.getTypeFactory().constructCollectionType(List.class, Mail.class));
 
-                // Ajouter les mails chargés à la liste statique mailList
+                // Add the loaded mails to the static mailList
                 mailList.addAll(loadedMails);
 
-                // Afficher les mails chargés
+                // Print the loaded mails
                 for (Mail mail : loadedMails) {
                     System.out.println("Subject: " + mail.getSubject());
                     System.out.println("Body: " + mail.getBody());
                 }
             } else {
-                System.err.println("La clé 'emails' n'est pas présente ou n'est pas un tableau.");
+                System.err.println("The 'emails' key is not present or is not an array.");
             }
 
         } catch (IOException e) {
-            System.err.println("Erreur lors de la lecture du fichier : " + e.getMessage());
+            System.err.println("Error reading the file: " + e.getMessage());
         }
     }
 
-    /*
-    Récupère un mail aléatoire de la liste statique.
-    @return : un objet Mail aléatoire.
-    */
+    /**
+     * Retrieves a random mail from the static list.
+     * 
+     * @return A random Mail object.
+     */
     public static Mail getRandomMail() {
         if (mailList.isEmpty()) {
-            throw new IllegalStateException("Aucun mail disponible. Chargez les mails d'abord.");
+            throw new IllegalStateException("No mails available. Please load the mails first.");
         }
         Random random = new Random();
         return mailList.get(random.nextInt(mailList.size()));
     }
 
-    /*
-    Retourne la liste complète des mails.
-    @return : liste des mails.
-    */
+    /**
+     * Returns the complete list of mails.
+     * 
+     * @return The list of all mails.
+     */
     public static ArrayList<Mail> getAllMails() {
         return new ArrayList<>(mailList);
     }

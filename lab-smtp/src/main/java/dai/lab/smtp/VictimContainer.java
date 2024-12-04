@@ -6,39 +6,48 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+/**
+ * A container class for managing the list of victims (email addresses).
+ * It validates email formats and loads a list of victims from a JSON file.
+ * 
+ * @author Samuel Fernandez
+ * @author Lovink Mark
+ */
 public class VictimContainer {
+
     public static ArrayList<String> victims = new ArrayList<String>();
 
-    /*
-    Getter for the list of victims.
-    @return : the list of valid victim email addresses.
-    */
+    /**
+     * Retrieves the list of valid victim email addresses.
+     * 
+     * @return A list of valid victim email addresses.
+     */
     public static ArrayList<String> getVictims() {
         return new ArrayList<String>(victims);
     }
 
-    /*
-    Validates the format of an email address.
-    @param userMail : the email address to validate.
-    @return : true if the email is valid, false otherwise.
-    */
+    /**
+     * Validates the format of an email address.
+     * 
+     * @param userMail The email address to validate.
+     * @return true if the email is valid, false otherwise.
+     */
     private static boolean validateVictim(String userMail) {
         if (userMail == null || userMail.isEmpty()) {
             return false;
         }
 
-        // Expression régulière pour valider les emails
+        // Regular expression to validate emails
         String emailRegex = "^[\\w._%+-]+@[\\w-]+(\\.[\\w-]+)*\\.[a-zA-Z]{2,}$";
 
-        // Retourne vrai si l'email correspond à l'expression régulière, sinon faux
         return userMail.matches(emailRegex);
     }
 
-    /*
-    Loads a list of valid email addresses from a JSON file.
-    @param filePath : the path of the file containing victim email addresses.
-    @return : a list of valid victim email addresses or null if the file path is invalid.
-    */
+    /**
+     * Loads a list of valid email addresses from a JSON file.
+     * 
+     * @param filePath The path of the file containing victim email addresses.
+     */
     public static void loadVictims(String filePath) {
         if (filePath == null || filePath.isEmpty()) {
             return;
@@ -46,11 +55,11 @@ public class VictimContainer {
 
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            // Charger le JSON à partir du fichier
+            // Load JSON from the file
             VictimList victimList = objectMapper.readValue(new File(filePath), VictimList.class);
 
             victims = new ArrayList<>();
-            // Ajouter chaque e-mail valide à la liste
+            // Add each valid email to the list
             for (String email : victimList.getVictims()) {
                 if (validateVictim(email)) {
                     victims.add(email);
@@ -61,7 +70,9 @@ public class VictimContainer {
         }
     }
 
-    // Classe interne pour représenter la structure JSON
+    /**
+     * A nested class to represent the structure of the JSON data for victims.
+     */
     public static class VictimList {
         private ArrayList<String> victims;
 
