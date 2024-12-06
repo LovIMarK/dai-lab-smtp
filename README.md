@@ -1,77 +1,277 @@
-DAI lab: SMTP
-=============
+# Implementation of an SMTP Client for Sending Jokes via Email 
 
-Objectives
-----------
+## Introduction 
 
-In this lab, you will develop a TCP client application in Java. This client application will use the Socket API to communicate with an SMTP server. The code that you write will include a **partial implementation of the SMTP protocol**. 
-
-These are the objectives of the lab:
-
-* Implement a more complex TCP client application in Java, which uses the Socket API to communicate with an SMTP server.
-* Make practical experiments to become familiar with the **SMTP protocol**. After the lab, you should be able to use a command line tool to communicate with an SMTP server. You should be able to send well-formed messages to the server, in order to send emails to the address of your choice.
-* Design a simple object-oriented model to implement the functional requirements described in the next paragraph.
+This project is a TCP client application written in Java that uses the SMTP protocol to send jokes via email to a group of recipients. The program allows you to configure victims, messages, and the number of groups from configuration files.
 
 
-Functional requirements
------------------------
-
-Your mission is to develop a client application that automatically plays e-mail pranks on a list of victims:
-
-* As configuration, the user of your program should provide
-  1. the **victims list**: a file with a list of e-mail addresses,
-  2. the **messages list**: a file with several e-mail messages (subject and body),
-  3. the **number of groups** `n` on which the e-mail prank is played. This can be provided e.g., as a command line argument.
-* Your program should form `n` groups by selecting 2-5 e-mail addresses from the file for each group. The first address of the group is the sender, the others are the receivers (victims).
-* For each group, your program should select one of the e-mail messages. 
-* The respective messages are then sent to the diffent groups using the SMTP protocol.
-
-Constraints
------------
-
-* Your client must be implemented in Java, with the `java.io` API.
-* The goal is for you to work at the wire protocol level (with the Socket API). Therefore, you CANNOT use a library that takes care of the protocol details. You have to work with the input and output streams.
-* The program must be configurable: the addresses, groups, messages CANNOT be hard-coded in the program and MUST be managed in config files.
-* You must send **one** e-mail per group, and not one e-mail for every member of every group.
-* There must be at least a simple validation process of the input files that displays errors on the console to describe what's wrong (e.g. an invalid number of groups, an invalid e-mail address that does not contain a '@' character, an invalid format, etc.).
-* The subject and body of the messages may contain non-ASCII characters. You have to encode the body and the subject of the e-mail correctly. You can find more information [here](https://ncona.com/2011/06/using-utf-8-characters-on-an-e-mail-subject/).
+---
 
 
-Example
--------
+# How to Run the Project 
+**Prerequisites:**  
+- **Java Development Kit (JDK):**  Ensure you have Java 8 or a newer version installed on your system.
+ 
+- **Docker Installed:**  Ensure Docker is installed and running on your system.
+ 
+- **SMTP Server (via Docker):**  The SMTP server will be launched using Docker. Ensure Docker is configured correctly.
 
-Consider that your program generates a group G1. The group sender is Bob. The group recipients are Alice, Claire and Peter. When the prank is played on group G1, then your program should pick one of the fake messages. It should communicate with an SMTP server, so that Alice, Claire and Peter receive an e-mail, which appears to be sent by Bob.
+### Steps to Launch the Project 
 
-SMTP server
------------
+#### 1. Clone or Download the Project 
 
-You can use [MailDev](https://github.com/maildev/maildev) as a mock SMTP server for your tests.  **Do not use a real SMTP server**.
+Start by cloning the repository or downloading the project files to your local machine.
 
-Use docker to start the server:
+#### 2. Launch the SMTP Server 
 
-    docker run -d -p 1080:1080 -p 1025:1025 maildev/maildev
+Use Docker to start the SMTP server with this command:
 
-This provides a Web interface on localhost:1080 and a SMTP server on localhost:1025.
 
-Deliverables
-------------
+```bash
+docker run -d --name smtp-server -p 1025:1025 -p 8025:8025 mailhog/mailhog
+```
 
-You will deliver the results of your lab in a GitHub repository. You do not have to fork a specific repo, you can create one from scratch.
+This launches a MailHog SMTP server with:
+ 
+- **SMTP port:**  1025
+ 
+- **Web interface:**  [http://localhost:8025](http://localhost:8025/) 
+Verify the server is running by accessing the web interface in your browser.
 
-Your repository should contain both the source code of your Java project and your report. Your report should be a single `README.md` file, located at the root of your repository. The images should be placed in a `figures` directory.
+#### 3. Configure the Project 
+Update the `config.json` file located in `lab-smtp/resources/` to adjust parameters: 
+- **Group Size:**  Set `groupSize` (between 2 and 5).
+ 
+- **SMTP Server:**  Use `127.0.0.1` for `ipAddress` and `1025` for `port`.
 
-Your report MUST include the following sections:
+#### 4. Customize JSON Files 
+Edit the following files in `lab-smtp/resources/` to suit your needs: 
+- `victims.json`: Add or modify email addresses for victims.
+ 
+- `mailMsgs.json`: Define custom email subjects and bodies.
 
-* **A brief description of your project**: if people exploring GitHub find your repo, without a prior knowledge of the API course, they should be able to understand what your repo is all about and whether they should look at it more closely.
+#### 5. Compile the Project 
 
-* **Instructions for setting up your mock SMTP server**. The user who wants to experiment with your tool but does not really want to send pranks immediately should be able to use a mock SMTP server.
+Navigate to the project root and compile the source files:
 
-* **Clear and simple instructions for configuring your tool and running a prank campaign**. If you do a good job, an external user should be able to clone your repo, edit a couple of files and send a batch of e-mails in less than 10 minutes.
 
-* **A description of your implementation**: document the key aspects of your code. It is a good idea to start with a **class diagram**. Decide which classes you want to show (focus on the important ones) and describe their responsibilities in text. It is also certainly a good idea to include examples of dialogues between your client and an SMTP server (maybe you also want to include some screenshots here).
+```bash
+javac -d bin src/dai/lab/smtp/*.java
+```
+This places the compiled files in the `bin` directory.
+#### 6. Run the Application 
+Run the main application from the `bin` directory:
 
-References
-----------
+```bash
+java dai.lab.smtp.App
+```
 
-* The [SMTP RFC](<https://tools.ietf.org/html/rfc5321#appendix-D>), and in particular the [example scenario](<https://tools.ietf.org/html/rfc5321#appendix-D>)
-* The [mailtrap](<https://mailtrap.io/>) online service for testing SMTP
+#### 7. Monitor the Results 
+The application divides victims into groups, sends prank emails, and logs progress in the console. View sent emails in the MailHog web interface at [http://localhost:8025](http://localhost:8025/) .
+### Troubleshooting 
+ 
+- **Invalid `groupSize`:**  Ensure `groupSize` in `config.json` is between 2 and 5.
+ 
+- **Docker Issues:**  Verify Docker is installed and running, and ensure the MailHog container started correctly.
+ 
+- **JSON Errors:**  Validate the syntax of `victims.json` and `mailMsgs.json` with a JSON validator.
+
+Feel free to experiment with the JSON files to customize group sizes, victim emails, or email messages.
+
+
+---
+
+
+## Class Diagram 
+
+Below is a class diagram describing the main components and their relationships.
+
+![UML](lab-smtp/figures/DAI_SMTP_UML.png)
+
+
+
+---
+
+
+## Implementation Description 
+
+### Main Classes and Their Responsibilities 
+ 
+1. **`ConfigurationManager`** 
+The `ConfigurationManager` class is responsible for loading and managing configuration data from a JSON file. It exposes methods for accessing essential parameters such as IP address, port, file paths for victims and messages, as well as the group size. 
+  - **Responsibilities:**  
+    - Read configurations from a JSON file located in `lab-smtp/resources/`.
+
+    - Validate configurations, including group size, which must be between 2 and 5.
+
+    - Provide centralized, static access to configuration parameters for the rest of the application.
+ 
+  - **Key Implementation Points:**  
+    - Uses **Jackson**  library for mapping JSON data to Java objects.
+
+    - Robust error handling: any issue related to loading the file or data format triggers an exception with a clear message.
+
+    - Checks constraints like group size to avoid inconsistencies at the configuration stage.
+ 
+  - **Expected JSON Structure for Configuration:** 
+
+```json
+{
+  "ipAddress": "127.0.0.1",
+  "port": 1025,
+  "victimsPath": "lab-smtp/resources/victims.txt",
+  "mailMsgsPath": "lab-smtp/resources/messages.txt",
+  "groupSize": 3
+}
+```
+ 
+  - **Example Usage in the Application:** 
+
+```java
+ConfigurationManager.loadConfiguration();
+String serverIp = ConfigurationManager.getIpAddress();
+int serverPort = ConfigurationManager.getPort();
+```
+ 
+  - **Link with Other Classes:**  
+    - `PrankManager` uses the paths to the victims and messages files to load data for creating groups.
+ 
+    - `SMTPClient` relies on IP address and port parameters to establish a connection to the SMTP server.
+
+
+---
+
+ 
+1. **`Mail`** 
+The `Mail` class represents an email with a subject and body. It provides methods to access these details and display them as strings. 
+  - **Responsibilities:** 
+    - Encapsulate email data: subject and content.
+
+    - Provide an easy way to retrieve this information through getters.
+
+    - Offer a clear text representation of the email for debugging or logging.
+ 
+  - **Key Implementation Points:** 
+    - Flexible constructors: a default constructor and another to directly initialize the subject and body.
+ 
+    - `toString` method to display an email in a readable format, useful for logs or testing features.
+ 
+  - **Example Usage in the Application:** 
+
+```java
+Mail email = new Mail("Subject Example", "This is the body of the email.");
+System.out.println(email);
+// Output:
+// Subject: Subject Example
+// Body: This is the body of the email.
+```
+ 
+  - **Link with Other Classes:**  
+    - `PrankManager` generates instances of `Mail` from message files to assign to groups.
+ 
+    - `SMTPClient` uses `Mail` objects to construct messages for sending via the SMTP protocol.
+
+
+---
+
+ 
+1. **`MailContainer`** 
+The `MailContainer` class manages a static list of emails (`Mail`). It provides methods to load, retrieve, and access emails stored in a JSON file. 
+  - **Responsibilities:** 
+    - Load a list of emails from a specified JSON file.
+
+    - Provide centralized access to the list of emails via static methods.
+
+    - Allow random retrieval of an email for various uses, such as automatically generating scenarios.
+ 
+  - **Key Implementation Points:**  
+    - Uses **Jackson**  to parse JSON files and transform data into `Mail` objects.
+
+    - Error handling to ensure the file is valid and contains expected information.
+ 
+    - Maintains a centralized list (`mailList`) to avoid unnecessary duplicates.
+ 
+  - **Example Usage in the Application:** 
+
+```java
+// Load emails from a file
+MailContainer.loadMails("lab-smtp/resources/mails.json");
+
+// Retrieve a random email
+Mail randomMail = MailContainer.getRandomMail();
+System.out.println(randomMail);
+
+// Retrieve all emails
+ArrayList<Mail> allMails = MailContainer.getAllMails();
+System.out.println("Number of loaded mails: " + allMails.size());
+```
+ 
+  - **Link with Other Classes:**  
+    - `PrankManager` uses `MailContainer` to select random emails and assign them to victim groups.
+ 
+    - The `Mail` class is closely linked, with each instance representing an email handled by `MailContainer`.
+ 
+  - **Important Note:**  
+    - The `getRandomMail` method ensures a random distribution among loaded emails.
+ 
+    - Emails must be properly structured in the JSON file under an `"emails"` key.
+
+
+---
+
+ 
+1. **`PrankManager`** 
+The `PrankManager` class is responsible for managing the entire email prank campaign. It coordinates configurations, victim processing, email sending, and communication with the SMTP server. 
+  - **Responsibilities:** 
+    - Load and validate configurations.
+
+    - Split victims into groups and manage email addresses.
+ 
+    - Send emails via an SMTP client (`SMTPClient`).
+
+    - Manage the SMTP connection and close it after sending.
+ 
+  - **Key Implementation Points:** 
+    - The class starts by loading configurations (config file, victims, and messages).
+
+    - Victims are then split into defined-sized groups, and for each group, an email is sent from the first member to the others.
+ 
+    - A random message is selected using `MailContainer.getRandomMail()`.
+
+    - An SMTP client is used to establish a connection, send emails, and close the session properly.
+ 
+  - **Example Usage in the Application:** 
+
+```java
+// Initialize and launch the prank campaign
+PrankManager prankManager = new PrankManager();
+```
+ 
+  - **Important Points:** 
+    - Group size validation is performed during initialization.
+
+    - A group is formed with the first member as the sender and others as recipients.
+
+    - If an error occurs, an error message is displayed, and the SMTP connection is properly closed.
+ 
+  - **Example Dialogue with the SMTP Server:** 
+
+```scss
+Sending email from alice@example.com to [bob@example.com, claire@example.com]
+CONNECT TO SMTP SERVER (localhost:1025)
+MAIL FROM: alice@example.com
+RCPT TO: bob@example.com
+DATA
+Subject: Fake Subject
+Body: This is a fake message.
+.
+QUIT
+```
+ 
+  - **Note:**  
+    - The class relies on components like `VictimContainer` for managing victims and `MailContainer` for messages.
+ 
+    - The `sendEmail` method of the `SMTPClient` class is responsible for interaction with the SMTP server.
+
+
+---
