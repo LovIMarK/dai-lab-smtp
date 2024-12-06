@@ -35,6 +35,11 @@ public class ConfigurationManager {
             victimsPath = config.getVictimsPath();
             mailMsgsPath = config.getMailMsgsPath();
             groupSize = config.getGroupSize();
+
+            if (groupSize < 2 || groupSize > 5) {
+                throw new IllegalArgumentException("Group size must be between 2 and 5. Current value: " + groupSize);
+            }
+
         } catch (IOException e) {
             throw new RuntimeException("Error loading the configuration file: " + e.getMessage());
         }
