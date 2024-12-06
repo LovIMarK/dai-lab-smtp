@@ -86,7 +86,8 @@ Feel free to experiment with the JSON files to customize group sizes, victim ema
 
 Below is a class diagram describing the main components and their relationships.
 
-![UML](lab-smtp\figures\DAI_SMTP_UML.png)
+![UML](lab-smtp/figures/DAI_SMTP_UML.png)
+
 
 
 ---
