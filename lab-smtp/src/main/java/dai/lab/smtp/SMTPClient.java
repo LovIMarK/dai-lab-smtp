@@ -101,7 +101,8 @@ public class SMTPClient {
         writer.write(".\r\n");
         writer.flush();
         readResponse(reader);
-    
+
+        // Reset the SMTP session to prepare for the next email transaction. Without closing the socket.
         sendCommand("RSET", writer);
     }
 
